@@ -2,7 +2,7 @@ import { getAccessToken } from './googleAuth';
 import { NewsItem, Organization, Leader, DocumentItem, CitizenAppeal, PortalSettings } from '../types';
 import { INITIAL_NEWS, INITIAL_ORGANIZATIONS, INITIAL_LEADERS, INITIAL_DOCUMENTS, INITIAL_APPEALS, INITIAL_SETTINGS } from '../data/initialData';
 import { PORTAL_CONFIG } from '../config/portalConfig';
-import { resolveAssetUrl } from '../utils/assetUrl';
+import { normalizePhotoUrl } from '../utils/uzbekTypography';
 
 const SHEETS_API_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
 const DRIVE_API_URL = 'https://www.googleapis.com/drive/v3';
@@ -124,7 +124,7 @@ export const getOrCreateSpreadsheet = async (): Promise<{ id: string; url: strin
 
   if (!createRes.ok) {
     const errText = await createRes.text();
-    throw new Error(`Google Sheets yaratişda xatolik: ${errText}`);
+    throw new Error(`Google Sheets yaratishda xatolik: ${errText}`);
   }
 
   const newSheet = await createRes.json();
@@ -394,8 +394,8 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     if (images.length === 0 && rawImg) {
       images = [rawImg];
     }
-    images = images.map((u) => resolveAssetUrl(u) as string);
-    const primaryImg = images[0] || resolveAssetUrl(rawImg) || (resolveAssetUrl('hero_education_district_1794303548345') as string);
+    const normalizedImages = images.map(img => normalizePhotoUrl(img)).filter(Boolean);
+    const primaryImg = normalizedImages[0] || normalizePhotoUrl(rawImg) || './assets/images/hero_education_district_1794303548345.jpg';
 
     return {
       id: r[0] || `news-${idx + 1}`,
@@ -405,7 +405,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
       summary: r[4] || '',
       content: r[5] || '',
       imageUrl: primaryImg,
-      images: images.length > 0 ? images : [primaryImg],
+      images: normalizedImages.length > 0 ? normalizedImages : [primaryImg],
       author: r[7] || 'Matbuot xizmati',
       views: parseInt(r[8] || '0', 10) || 0,
       isPinned: r[9] === 'ha' || r[9] === 'true',
@@ -462,7 +462,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     // Determine name
     let name = col3 || col2 || col1 || `${number}-sonli ${type === 'mtt' ? 'MTT' : 'maktab'}`;
     if (/^\d+$/.test(name)) {
-      name = `${name}-sonli ${type === 'mtt' ? 'maktabgaça ta\'lim taşkiloti' : 'umumiy o\'rta ta\'lim maktabi'}`;
+      name = `${name}-sonli ${type === 'mtt' ? 'maktabgacha ta\'lim tashkiloti' : 'umumiy o\'rta ta\'lim maktabi'}`;
     }
 
     return {
@@ -470,8 +470,8 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
       type,
       number,
       name,
-      address: col4 || "Qöşköpir tumani",
-      mahalla: col5 || "Qöşköpir",
+      address: col4 || "Qo'shko'pir tumani",
+      mahalla: col5 || "Qo'shko'pir",
       director: col6 || "Rahbar tayinlanmagan",
       phone: col7.includes('#') ? "+998 (62) 352-00-00" : (col7 || "+998 (62) 352-00-00"),
       email: String(r[8] || "").includes('#') ? "" : String(r[8] || ""),
@@ -480,7 +480,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
       shifts: parseInt(r[11] || '1', 10) || 1,
       establishedYear: parseInt(r[12] || '1990', 10) || 1990,
       rating: parseFloat(r[13] || '4.8') || 4.8,
-      photoUrl: resolveAssetUrl(r[14]) || undefined
+      photoUrl: normalizePhotoUrl(r[14]) || undefined
     };
   });
 
@@ -503,7 +503,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     receptionDays: r[6] || '',
     receptionHours: r[7] || '',
     bio: r[8] || '',
-    photoUrl: resolveAssetUrl(r[9] || 'department_head_portrait_1794303519848') as string,
+    photoUrl: normalizePhotoUrl(r[9]) || './assets/images/department_head_portrait_1794303519848.jpg',
     order: parseInt(r[10] || `${idx + 1}`, 10) || idx + 1
   }));
 
@@ -708,6 +708,6 @@ export const syncAllDataToGoogleSheets = async (
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`Google Sheets yangilaşda xatolik: ${err}`);
+    throw new Error(`Google Sheets yangilashda xatolik: ${err}`);
   }
 };

@@ -30,7 +30,12 @@ export const formatTelegramMessage = (news: NewsItem, settings: PortalSettings):
     `✍️ <b>Muallif:</b> ${escapeHtml(news.author)}\n\n` +
     `🌐 <b>Batafsil portalda o‘qish:</b>\n` +
     `<a href="${currentUrl}">Qo‘shko‘pir tumani MMTB rasmiy portali</a>\n\n` +
-    `👉 @${settings.telegramChannelUsername ? settings.telegramChannelUsername.replace('@', '') : 'qoshkopir_mmtb'}`;
+    `📲 Bölimning rasmiy sahifalariga obuna böling!\n` +
+    `🌐 <a href="https://qoshkopirtalim.uz/">Web sayt</a> | ` +
+    `✅ <a href="https://t.me/qoshmmtbkanal">Telegram</a> | ` +
+    `🌐 <a href="https://www.instagram.com/qoshkopirtalim">Instagram</a> | ` +
+    `✅ <a href="https://www.facebook.com/groups/693971028087553">Facebook</a> | ` +
+    `📹 <a href="https://www.youtube.com/@QoshkopirtMMTB">YouTube</a>`;
 };
 
 /**

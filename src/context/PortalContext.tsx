@@ -23,6 +23,7 @@ import { PORTAL_CONFIG } from '../config/portalConfig';
 import { toNewUzbekAlphabet } from '../utils/uzbekTypography';
 
 import { createGoogleAdminSession, isEmailAllowedAdmin } from '../services/adminAuth';
+import { normalizeSettings } from '../utils/normalizeSettings';
 
 export interface AdminGoogleAuthResult {
   authorized: boolean;
@@ -158,18 +159,12 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           !parsed.regionLabel || parsed.regionLabel === "Xorazm viloyati · Qo'shko'pir"
             ? INITIAL_SETTINGS.regionLabel
             : parsed.regionLabel;
-        return {
-          ...INITIAL_SETTINGS,
+        return normalizeSettings({
           ...parsed,
           districtName: migratedDistrictName,
           shortName: migratedShortName,
-          regionLabel: migratedRegionLabel,
-          navLabels: { ...INITIAL_SETTINGS.navLabels, ...(parsed.navLabels || {}) },
-          allowedAdminEmails:
-            Array.isArray(parsed.allowedAdminEmails) && parsed.allowedAdminEmails.length > 0
-              ? parsed.allowedAdminEmails
-              : INITIAL_SETTINGS.allowedAdminEmails
-        };
+          regionLabel: migratedRegionLabel
+        });
       }
       return INITIAL_SETTINGS;
     } catch {
@@ -316,7 +311,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               setLeaders(loaded.leaders);
               setDocuments(loaded.documents);
               setAppeals(loaded.appeals);
-              setSettings(prev => ({ ...INITIAL_SETTINGS, ...prev, ...loaded.settings }));
+              setSettings(prev => normalizeSettings({ ...prev, ...loaded.settings }));
               latestAllowedEmails = Array.from(new Set([
                 ...(loaded.settings.allowedAdminEmails || []),
                 ...loaded.leaders.map(l => l.adminEmail || '').filter(Boolean),
@@ -403,17 +398,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           } catch {}
         }
         if (loaded.settings) {
-          setSettings(prev => ({
-            ...INITIAL_SETTINGS,
-            ...prev,
-            ...loaded.settings,
-            navLabels: {
-              ...INITIAL_SETTINGS.navLabels,
-              ...(prev.navLabels || {}),
-              ...(loaded.settings.navLabels || {})
-            },
-            googleSpreadsheetId: cleanId
-          }));
+          setSettings(prev => {
+            const loadedSettings = normalizeSettings({ ...prev, ...loaded.settings });
+            return {
+              ...loadedSettings,
+              navLabels: { ...normalizeSettings(prev).navLabels, ...loadedSettings.navLabels },
+              googleSpreadsheetId: cleanId
+            };
+          });
         }
       }
       setGoogleSyncStatus(prev => ({
@@ -526,7 +518,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           setLeaders(loaded.leaders);
           setDocuments(loaded.documents);
           setAppeals(loaded.appeals);
-          setSettings(prev => ({ ...INITIAL_SETTINGS, ...prev, ...loaded.settings }));
+          setSettings(prev => normalizeSettings({ ...prev, ...loaded.settings }));
         }
       }
     } catch (err: any) {
@@ -609,7 +601,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           setLeaders(loaded.leaders);
           setDocuments(loaded.documents);
           setAppeals(loaded.appeals);
-          setSettings(prev => ({ ...INITIAL_SETTINGS, ...prev, ...loaded.settings }));
+          setSettings(prev => normalizeSettings({ ...prev, ...loaded.settings }));
           latestAllowedEmails = Array.from(new Set([
             ...(loaded.settings.allowedAdminEmails || []),
             ...loaded.leaders.map(l => l.adminEmail || '').filter(Boolean),
@@ -687,14 +679,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
         if (loaded.settings) {
           setSettings(prev => ({
-            ...INITIAL_SETTINGS,
-            ...prev,
-            ...loaded.settings,
-            navLabels: {
-              ...INITIAL_SETTINGS.navLabels,
-              ...(prev.navLabels || {}),
-              ...(loaded.settings.navLabels || {})
-            },
+            ...normalizeSettings({ ...prev, ...loaded.settings }),
             googleSpreadsheetId: clean
           }));
         } else {
@@ -895,7 +880,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const updateSettings = async (newSettings: Partial<PortalSettings>) => {
-    const updated: PortalSettings = { ...settings, ...newSettings };
+    const updated: PortalSettings = normalizeSettings({ ...settings, ...newSettings });
     setSettings(updated);
     if (googleSyncStatus.spreadsheetId) {
       await triggerGoogleSheetsSync(undefined, { settings: updated });

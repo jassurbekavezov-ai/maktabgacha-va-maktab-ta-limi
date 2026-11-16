@@ -20,7 +20,7 @@ interface HeroSectionProps {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNavigate }) => {
-  const { news, settings, t } = usePortal();
+  const { publicNews: news, settings, t } = usePortal();
 
   // Find pinned or most recent news
   const featuredNews = news.find(n => n.isPinned) || news[0];

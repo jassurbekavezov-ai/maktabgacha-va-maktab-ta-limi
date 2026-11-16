@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { User } from 'firebase/auth';
 import { NewsItem, Organization, Leader, DocumentItem, CitizenAppeal, PortalSettings, GoogleSyncStatus } from '../types';
 import {
@@ -34,6 +34,8 @@ export interface AdminGoogleAuthResult {
 interface PortalContextType {
   // State
   news: NewsItem[];
+  /** Saytdagi yangiliklar + Telegram kanal postlari (ommaviy sahifalar uchun) */
+  publicNews: NewsItem[];
   organizations: Organization[];
   leaders: Leader[];
   documents: DocumentItem[];
@@ -171,6 +173,44 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return INITIAL_SETTINGS;
     }
   });
+
+  // Telegram kanal postlari (deploy paytida public/telegram-news.json ga yoziladi)
+  const [telegramNews, setTelegramNews] = useState<NewsItem[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/telegram-news.json?t=${Math.floor(Date.now() / 300000)}`)
+      .then(res => (res.ok ? res.json() : []))
+      .then(data => {
+        if (!cancelled && Array.isArray(data)) setTelegramNews(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const publicNews = useMemo<NewsItem[]>(() => {
+    const normTitle = (s: string) => String(s || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '').slice(0, 60);
+    const siteTgIds = new Set(news.map(n => n.telegramMessageId).filter(Boolean).map(String));
+    const siteTitles = new Set(news.map(n => normTitle(n.title)));
+    const fallbackImg = './assets/images/hero_education_district_1794303548345.jpg';
+    const extra = telegramNews
+      .filter(tg => !siteTgIds.has(String(tg.telegramMessageId)) && !siteTitles.has(normTitle(tg.title)))
+      .map(tg => {
+        const images = Array.isArray(tg.images) && tg.images.length > 0 ? tg.images : [];
+        const imageUrl = tg.imageUrl || images[0] || fallbackImg;
+        return { ...tg, imageUrl, images: images.length > 0 ? images : [imageUrl] };
+      });
+    const dateKey = (n: NewsItem) => {
+      const s = String(n.date || '');
+      const m = s.match(/^Date\((\d{4}),\s*(\d{1,2}),\s*(\d{1,2})/);
+      return m ? `${m[1]}-${String(+m[2] + 1).padStart(2, '0')}-${m[3].padStart(2, '0')}` : s.slice(0, 10);
+    };
+    return [...news, ...extra].sort((a, b) => {
+      if (!!b.isPinned !== !!a.isPinned) return b.isPinned ? 1 : -1;
+      return dateKey(b).localeCompare(dateKey(a));
+    });
+  }, [news, telegramNews]);
 
   // Google State
   const [user, setUser] = useState<User | null>(null);
@@ -935,6 +975,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     <PortalContext.Provider
       value={{
         news,
+        publicNews,
         organizations,
         leaders,
         documents,

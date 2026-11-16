@@ -3,6 +3,9 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: ['main', 'master']
+  schedule:
+    # Har 30 daqiqada Telegram kanaldagi yangi postlarni saytga olib kelish
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -31,6 +34,9 @@ jobs:
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
+
+      - name: Telegram kanal postlarini olish
+        run: node scripts/fetch-telegram-news.mjs
 
       - name: Build project
         run: npm run build

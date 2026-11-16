@@ -23,7 +23,19 @@ function PortalMain() {
   const [adminInitialTab, setAdminInitialTab] = useState<AdminTab>('overview');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginModalExternalError, setLoginModalExternalError] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState('asosiy');
+  const PAGE_IDS = ['asosiy', 'bolim-haqida', 'muassasalar', 'hujjatlar', 'yangiliklar', 'murojaat', 'aloqa'];
+  const pageFromHash = () => {
+    const h = decodeURIComponent(window.location.hash.replace('#', ''));
+    return PAGE_IDS.includes(h) ? h : 'asosiy';
+  };
+  const [activeSection, setActiveSection] = useState(pageFromHash);
+
+  // Brauzerning "orqaga" tugmasi va havola orqali to'g'ridan-to'g'ri bo'limga kirish
+  useEffect(() => {
+    const onHash = () => setActiveSection(pageFromHash());
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
 
   useEffect(() => {
@@ -50,8 +62,13 @@ function PortalMain() {
   };
 
   const scrollToSection = (sectionId: string) => {
-    setActiveSection(sectionId);
-    if (sectionId === 'asosiy') {
+    // Har bir bo'lim alohida sahifa sifatida ochiladi
+    if (PAGE_IDS.includes(sectionId)) {
+      setActiveSection(sectionId);
+      const newHash = sectionId === 'asosiy' ? '' : `#${sectionId}`;
+      if (window.location.hash !== newHash) {
+        history.pushState(null, '', newHash || window.location.pathname + window.location.search);
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -83,36 +100,49 @@ function PortalMain() {
 
       {/* 3. Main Content Sections */}
       <main className="flex-1">
-        {/* Asosiy */}
-        <HeroSection
-          onSelectNews={(news) => {
-            setSelectedNews(news);
-            scrollToSection('yangiliklar');
-          }}
-          onNavigate={scrollToSection}
-        />
-        <StatsStrip />
+        {/* Asosiy: yuqori qism + so'nggi 5 ta yangilik */}
+        {activeSection === 'asosiy' && (
+          <>
+            <HeroSection
+              onSelectNews={(news) => setSelectedNews(news)}
+              onNavigate={scrollToSection}
+            />
+            <NewsSection
+              selectedNews={selectedNews}
+              onSelectNews={setSelectedNews}
+              limit={5}
+              onShowAll={() => scrollToSection('yangiliklar')}
+            />
+          </>
+        )}
 
         {/* Tashkilot haqida */}
-        <AboutSection onEditAbout={() => handleOpenAdmin('about')} />
+        {activeSection === 'bolim-haqida' && (
+          <>
+            <StatsStrip />
+            <AboutSection onEditAbout={() => handleOpenAdmin('about')} />
+          </>
+        )}
 
         {/* Muassasalar */}
-        <OrganizationsDirectory />
+        {activeSection === 'muassasalar' && <OrganizationsDirectory />}
 
         {/* Hujjatlar */}
-        <DocumentsSection />
+        {activeSection === 'hujjatlar' && <DocumentsSection />}
 
         {/* Yangiliklar */}
-        <NewsSection
-          selectedNews={selectedNews}
-          onSelectNews={setSelectedNews}
-        />
+        {activeSection === 'yangiliklar' && (
+          <NewsSection
+            selectedNews={selectedNews}
+            onSelectNews={setSelectedNews}
+          />
+        )}
 
         {/* Virtual qabulxona */}
-        <VirtualReception />
+        {activeSection === 'murojaat' && <VirtualReception />}
 
         {/* Aloqa */}
-        <ContactMapSection />
+        {activeSection === 'aloqa' && <ContactMapSection />}
       </main>
 
       {/* 4. Footer */}

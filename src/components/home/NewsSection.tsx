@@ -12,7 +12,8 @@ import {
   Maximize2,
   FolderOpen,
   Images,
-  ExternalLink
+  ExternalLink,
+  PlayCircle
 } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 import { NewsItem } from '../../types';
@@ -174,6 +175,14 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                   <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-xs text-white text-[11px] font-semibold px-2.5 py-1 rounded">
                     {t(item.category)}
                   </div>
+
+                  {item.videos && item.videos.length > 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="bg-slate-900/70 rounded-full p-2.5 shadow-lg">
+                        <PlayCircle className="w-9 h-9 text-white" />
+                      </div>
+                    </div>
+                  )}
 
                   {/* Multi-image indicator badge */}
                   {hasMultipleImages && (
@@ -401,6 +410,47 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
               <div className="prose prose-slate max-w-none text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line">
                 {t(selectedNews.content)}
               </div>
+
+              {selectedNews.videos && selectedNews.videos.length > 0 && (
+                <div className="mt-6 space-y-4">
+                  {selectedNews.videos.map((vid, i) =>
+                    vid.src ? (
+                      <video
+                        key={i}
+                        src={vid.src}
+                        poster={vid.thumb || undefined}
+                        controls
+                        playsInline
+                        preload="metadata"
+                        className="w-full max-h-[70vh] rounded-xl bg-black"
+                      />
+                    ) : (
+                      <a
+                        key={i}
+                        href={vid.url || selectedNews.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="relative block w-full rounded-xl overflow-hidden bg-slate-900 group/vid"
+                      >
+                        {vid.thumb && (
+                          <img
+                            src={vid.thumb}
+                            alt=""
+                            referrerPolicy="no-referrer"
+                            className="w-full max-h-[70vh] object-cover opacity-80 group-hover/vid:opacity-60 transition-opacity"
+                          />
+                        )}
+                        <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-white">
+                          <PlayCircle className="w-16 h-16" />
+                          <span className="text-sm font-semibold bg-slate-900/70 px-3 py-1 rounded-md">
+                            {t("Videoni Telegramda ko'rish")}{vid.duration ? ` · ${vid.duration}` : ''}
+                          </span>
+                        </span>
+                      </a>
+                    )
+                  )}
+                </div>
+              )}
 
               {selectedNews.sourceUrl && (
                 <a

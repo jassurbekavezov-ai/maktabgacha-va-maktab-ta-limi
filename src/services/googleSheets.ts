@@ -6,6 +6,17 @@ import { normalizePhotoUrl } from '../utils/uzbekTypography';
 import { normalizeSettings } from '../utils/normalizeSettings';
 
 const SHEETS_API_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
+
+/** Google gviz "Date(2026,10,14)" formatini "2026-11-14" ga aylantiradi */
+const normalizeSheetDate = (value: unknown): string => {
+  const s = String(value ?? '').trim();
+  const m = s.match(/^Date\((\d{4}),\s*(\d{1,2}),\s*(\d{1,2})/);
+  if (m) {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${m[1]}-${pad(Number(m[2]) + 1)}-${pad(Number(m[3]))}`;
+  }
+  return s;
+};
 const DRIVE_API_URL = 'https://www.googleapis.com/drive/v3';
 const SPREADSHEET_TITLE = "Talim_Tashkiloti_Rasmiy_Baza";
 const SPREADSHEET_STORAGE_KEY = 'qoshkopir_mmtb_spreadsheet_id';
@@ -492,7 +503,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
       id: r[0] || `news-${idx + 1}`,
       title: r[1] || 'Yangilik sarlavhasi',
       category: (r[2] as any) || 'Boshqaruv',
-      date: r[3] || new Date().toISOString().split('T')[0],
+      date: normalizeSheetDate(r[3]) || new Date().toISOString().split('T')[0],
       summary: r[4] || '',
       content: r[5] || '',
       imageUrl: primaryImg,

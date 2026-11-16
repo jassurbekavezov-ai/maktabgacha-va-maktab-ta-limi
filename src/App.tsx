@@ -111,7 +111,7 @@ function PortalMain() {
             <NewsSection
               selectedNews={selectedNews}
               onSelectNews={setSelectedNews}
-              limit={5}
+              limit={6}
               onShowAll={() => scrollToSection('yangiliklar')}
             />
           </>

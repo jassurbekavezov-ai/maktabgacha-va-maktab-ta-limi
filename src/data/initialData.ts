@@ -8,7 +8,7 @@ export const INITIAL_SETTINGS: PortalSettings = {
   regionLabel: "Xorazm viloyati",
   portalSubtitle: "Rasmiy axborot va elektron xizmatlar portali",
   departmentPhone: "+998 (62) 352-14-25",
-  trustPhone: "+998 (62) 352-11-02",
+  trustPhone: "+998 (55) 605-50-93",
   email: "info@talim-tashkiloti.uz",
   address: "Xorazm viloyati, Qo'shko'pir, Mustaqillik ko'chasi, 24-uy",
   workingHours: "Dushanba - Juma: 09:00 - 18:00 (Tushlik: 13:00 - 14:00)",

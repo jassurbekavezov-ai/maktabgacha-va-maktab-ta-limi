@@ -24,7 +24,7 @@ interface NewsSectionProps {
 }
 
 export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelectNews }) => {
-  const { settings, news, speakText, t } = usePortal();
+  const { settings, publicNews: news, speakText, t } = usePortal();
   const [selectedCategory, setSelectedCategory] = useState<string>('Barchasi');
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
@@ -401,6 +401,17 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
               <div className="prose prose-slate max-w-none text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line">
                 {t(selectedNews.content)}
               </div>
+
+              {selectedNews.sourceUrl && (
+                <a
+                  href={selectedNews.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:text-sky-900"
+                >
+                  {t("Telegram kanalda ko'rish")} →
+                </a>
+              )}
 
               {/* Gallery Grid Preview inside Article Body */}
               {currentGallery.length > 1 && (

@@ -50,10 +50,30 @@ export const parseChannelHtml = (html, channel = CHANNEL) => {
     // Saytdan Telegramga yuborilgan postlar saytda allaqachon bor
     if (/Batafsil portalda o.qish/i.test(text)) continue;
 
+    // Matndan oldingi qism — media (rasm/video) shu yerda; matndagi animatsion emoji'lar kirmaydi
+    const textStart = chunk.indexOf('tgme_widget_message_text js-message_text');
+    const mediaPart = textStart > 0 ? chunk.slice(0, textStart) : chunk;
+
     const images = [];
-    const imgRe = /class="tgme_widget_message_(?:photo_wrap|video_thumb)[^"]*"[^>]*style="[^"]*background-image:url\('([^']+)'\)/g;
+    const imgRe = /class="tgme_widget_message_photo_wrap[^"]*"[^>]*style="[^"]*background-image:url\('([^']+)'\)/g;
     let im;
-    while ((im = imgRe.exec(chunk))) if (!images.includes(im[1])) images.push(im[1]);
+    while ((im = imgRe.exec(mediaPart))) if (!images.includes(im[1])) images.push(im[1]);
+
+    // Videolar: kichiklari to'g'ridan-to'g'ri o'ynatiladi (src), kattalari faqat Telegramda ochiladi
+    const videos = [];
+    const vidParts = mediaPart.split('class="tgme_widget_message_video_player').slice(1);
+    for (const part of vidParts) {
+      const src = part.match(/<video[^>]*\ssrc="([^"]+)"/);
+      const thumb = part.match(/background-image:url\('([^']+)'\)/);
+      const duration = part.match(/message_video_duration[^"]*"[^>]*>([^<]+)</);
+      const href = part.match(/href="(https:\/\/t\.me\/[^"]+)"/);
+      videos.push({
+        src: src ? decode(src[1]) : '',
+        thumb: thumb ? thumb[1] : '',
+        duration: duration ? duration[1].trim() : '',
+        url: href ? decode(href[1]) : `https://t.me/${channel}/${msgId}`
+      });
+    }
 
     const time = chunk.match(/<time[^>]*datetime="([^"]+)"/);
     const views = chunk.match(/tgme_widget_message_views">([^<]+)</);
@@ -78,8 +98,9 @@ export const parseChannelHtml = (html, channel = CHANNEL) => {
       datetime: time ? time[1] : null,
       summary,
       content: text,
-      imageUrl: images[0] || '',
-      images,
+      imageUrl: images[0] || (videos[0] && videos[0].thumb) || '',
+      images: images.length > 0 ? images : videos.map((v) => v.thumb).filter(Boolean).slice(0, 1),
+      videos,
       author: 'Telegram kanal',
       views: parseViews(views && views[1]),
       telegramMessageId: String(msgId),

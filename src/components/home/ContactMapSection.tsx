@@ -2,6 +2,9 @@ import React from 'react';
 import { MapPin, Phone, Mail, Clock, Send, Globe } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 
+const MAP_LAT = '41.52793681140537';
+const MAP_LNG = '60.35879624415235';
+
 export const ContactMapSection: React.FC = () => {
   const { settings, t } = usePortal();
 
@@ -46,21 +49,10 @@ export const ContactMapSection: React.FC = () => {
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-semibold text-slate-500 uppercase">{t("Qabulxona va ishonch telefoni:")}</h4>
-                  <div className="mt-1 space-y-1">
-                    <div>
-                      <span className="text-xs text-slate-600">{t("Umumiy qabulxona")}: </span>
-                      <a href={`tel:${settings.departmentPhone.replace(/\D/g, '')}`} className="text-sm font-bold text-sky-800 hover:underline">
-                        {settings.departmentPhone}
-                      </a>
-                    </div>
-                    <div>
-                      <span className="text-xs text-slate-600">{t("Ishonch telefoni")}: </span>
-                      <a href={`tel:${settings.trustPhone.replace(/\D/g, '')}`} className="text-sm font-bold text-amber-700 hover:underline">
-                        {settings.trustPhone}
-                      </a>
-                    </div>
-                  </div>
+                  <h4 className="text-xs font-semibold text-slate-500 uppercase">{t("Ishonch telefoni:")}</h4>
+                  <a href="tel:998556055093" className="text-sm font-bold text-amber-700 hover:underline">
+                    +998 (55) 605-50-93
+                  </a>
                 </div>
               </div>
 
@@ -70,8 +62,8 @@ export const ContactMapSection: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="text-xs font-semibold text-slate-500 uppercase">{t("Elektron pochta:")}</h4>
-                  <a href={`mailto:${settings.email}`} className="text-sm font-semibold text-sky-800 hover:underline">
-                    {settings.email}
+                  <a href="mailto:qoshkopirtalim@umail.uz" className="text-sm font-semibold text-sky-800 hover:underline">
+                    qoshkopirtalim@umail.uz
                   </a>
                 </div>
               </div>
@@ -121,37 +113,38 @@ export const ContactMapSection: React.FC = () => {
             </div>
           </div>
 
-          {/* District Visual Map Presentation */}
-          <div className="lg:col-span-7 bg-slate-100 rounded-2xl border border-slate-200 overflow-hidden relative min-h-[360px] flex flex-col justify-between p-6">
-            <div className="bg-white/95 backdrop-blur-xs p-4 rounded-xl shadow-xs max-w-sm border border-slate-200">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-sky-800 block mb-1">
-                {t(settings.mapAreaTitle || settings.regionLabel || settings.shortName)}
-              </span>
-              <p className="text-xs text-slate-700 font-medium">
-                {t(settings.mapAreaDesc)}
-              </p>
-            </div>
-
-            <div className="bg-white/95 backdrop-blur-xs p-4 rounded-xl shadow-xs border border-slate-200 flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold text-slate-900 block">
-                  {t(settings.mapTransportLabel || "Jamoat transporti:")}
-                </span>
-                <span className="text-xs text-slate-600">
-                  {t(settings.mapTransportText)}
+          {/* Tashkilot joylashuvi xaritasi */}
+          <div className="lg:col-span-7 rounded-2xl border border-slate-200 bg-slate-50/70 p-5">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-sky-800" />
+                <span className="text-xs font-bold uppercase tracking-wider text-sky-800">
+                  {t("Tashkilot joylashuvi")}
                 </span>
               </div>
-              {settings.mapExternalUrl && (
-                <a
-                  href={settings.mapExternalUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1.5 bg-sky-800 text-white rounded text-xs font-semibold hover:bg-sky-900 shrink-0 ml-3"
-                >
-                  {t("Xaritada ko'rish")}
-                </a>
-              )}
+              <a
+                href={`https://www.google.com/maps?q=${MAP_LAT},${MAP_LNG}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 bg-sky-800 text-white rounded text-xs font-semibold hover:bg-sky-900 shrink-0"
+              >
+                {t("Xaritada ko'rish")}
+              </a>
             </div>
+            <div className="rounded-xl overflow-hidden border border-slate-200 bg-white">
+              <iframe
+                title={t("Tashkilot joylashuvi")}
+                src={`https://maps.google.com/maps?q=${MAP_LAT},${MAP_LNG}&z=16&output=embed`}
+                className="w-full h-[300px] block"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </div>
+            <p className="text-xs text-slate-500 mt-2">
+              {t("Koordinatalar")}: {MAP_LAT}, {MAP_LNG}
+            </p>
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { NewsItem, Organization, Leader, DocumentItem, CitizenAppeal, PortalSett
 import { INITIAL_NEWS, INITIAL_ORGANIZATIONS, INITIAL_LEADERS, INITIAL_DOCUMENTS, INITIAL_APPEALS, INITIAL_SETTINGS } from '../data/initialData';
 import { PORTAL_CONFIG } from '../config/portalConfig';
 import { normalizePhotoUrl } from '../utils/uzbekTypography';
+import { normalizeSettings } from '../utils/normalizeSettings';
 
 const SHEETS_API_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
 const DRIVE_API_URL = 'https://www.googleapis.com/drive/v3';
@@ -146,7 +147,9 @@ export const getOrCreateSpreadsheet = async (): Promise<{ id: string; url: strin
 /**
  * Builds 3-column Sozlamalar rows: [Kalit, Qiymat, Bolim_Va_Tavsif]
  */
-const buildSettingsRows = (s: PortalSettings): string[][] => [
+const buildSettingsRows = (rawSettings: PortalSettings): string[][] => {
+  const s = normalizeSettings(rawSettings);
+  return [
   // Tashkilot & Header
   ['districtName', s.districtName || '', "Umumiy · Tashkilot to'liq nomi"],
   ['shortName', s.shortName || '', "Umumiy · Tashkilot qisqa nomi"],
@@ -263,7 +266,8 @@ const buildSettingsRows = (s: PortalSettings): string[][] => [
   ['instagramAccountId', s.instagramAccountId || '', "Ijtimoiy tarmoqlar · Instagram Account ID"],
   ['instagramAccessToken', s.instagramAccessToken || '', "Ijtimoiy tarmoqlar · Instagram Token"],
   ['instagramAutoPublish', s.instagramAutoPublish ? 'ha' : 'yoq', "Ijtimoiy tarmoqlar · IG avto-yuborish"]
-];
+  ];
+};
 
 /**
  * Seeds initial data to Google Sheets
@@ -712,7 +716,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     leaders: leaders.length > 0 ? leaders : INITIAL_LEADERS,
     documents: documents.length > 0 ? documents : INITIAL_DOCUMENTS,
     appeals: appeals.length > 0 ? appeals : INITIAL_APPEALS,
-    settings: settingsObj as PortalSettings
+    settings: normalizeSettings(settingsObj)
   };
 };
 

@@ -42,6 +42,13 @@ export interface DepartmentBranch {
   description: string;
 }
 
+export interface NewsVideo {
+  src?: string; // To'g'ridan-to'g'ri o'ynatiladigan havola (bo'lmasa — faqat Telegramda)
+  thumb?: string;
+  duration?: string;
+  url?: string; // Telegramdagi post havolasi
+}
+
 export interface NewsItem {
   id: string;
   title: string;
@@ -64,6 +71,7 @@ export interface NewsItem {
   instagramMediaId?: string;
   sourceUrl?: string; // Asl manba (masalan, Telegram post havolasi)
   source?: 'site' | 'telegram';
+  videos?: NewsVideo[]; // Telegram kanal videolari
 }
 
 export interface Organization {

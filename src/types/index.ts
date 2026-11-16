@@ -62,6 +62,8 @@ export interface NewsItem {
   sentToInstagram?: boolean;
   telegramMessageId?: string;
   instagramMediaId?: string;
+  sourceUrl?: string; // Asl manba (masalan, Telegram post havolasi)
+  source?: 'site' | 'telegram';
 }
 
 export interface Organization {

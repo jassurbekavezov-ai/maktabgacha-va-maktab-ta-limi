@@ -11,6 +11,7 @@ import { NewsSection } from './components/home/NewsSection';
 import { VirtualReception } from './components/home/VirtualReception';
 import { ContactMapSection } from './components/home/ContactMapSection';
 import { FooterGov } from './components/common/FooterGov';
+import { FloatingSocial } from './components/common/FloatingSocial';
 import { AdminDashboard, AdminTab } from './components/admin/AdminDashboard';
 import { AdminLoginModal } from './components/admin/AdminLoginModal';
 import { checkAdminSession } from './services/adminAuth';
@@ -144,6 +145,8 @@ function PortalMain() {
         {/* Aloqa */}
         {activeSection === 'aloqa' && <ContactMapSection />}
       </main>
+
+      <FloatingSocial />
 
       {/* 4. Footer */}
       <FooterGov

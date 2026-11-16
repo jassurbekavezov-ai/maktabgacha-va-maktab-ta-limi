@@ -223,8 +223,8 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
         >
           <img
             src={stateEmblem}
-            alt={t("O'zbekiston Davlat Gerbi")}
-            className="w-12 h-12 object-contain drop-shadow-xs group-hover:scale-105 transition-transform"
+            alt={t(settings.districtName || "Ta'lim bo'limi logotipi")}
+            className="w-14 h-14 object-contain drop-shadow-xs group-hover:scale-105 transition-transform"
             referrerPolicy="no-referrer"
           />
           <div className="flex flex-col">
@@ -247,12 +247,12 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
         {/* Desktop Quick Contacts & Admin Button */}
         <div className="hidden lg:flex items-center gap-4 shrink-0">
           <div className="text-right">
-            <span className="text-xs text-slate-500 block">{t("Qabulxona:")}</span>
+            <span className="text-xs text-slate-500 block">{t("Ishonch telefoni:")}</span>
             <a
-              href={`tel:${settings.departmentPhone.replace(/\D/g, '')}`}
+              href={`tel:${settings.trustPhone.replace(/\D/g, '')}`}
               className="text-sm font-semibold text-slate-800 hover:text-sky-700"
             >
-              {settings.departmentPhone}
+              {settings.trustPhone}
             </a>
           </div>
 

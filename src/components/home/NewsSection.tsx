@@ -22,9 +22,12 @@ import { PORTAL_CONFIG } from '../../config/portalConfig';
 interface NewsSectionProps {
   selectedNews: NewsItem | null;
   onSelectNews: (news: NewsItem | null) => void;
+  /** Asosiy sahifa uchun: faqat oxirgi N ta yangilik, filtrsiz */
+  limit?: number;
+  onShowAll?: () => void;
 }
 
-export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelectNews }) => {
+export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelectNews, limit, onShowAll }) => {
   const { settings, publicNews: news, speakText, t } = usePortal();
   const [selectedCategory, setSelectedCategory] = useState<string>('Barchasi');
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
@@ -123,7 +126,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
               {t(settings.newsKicker || "Axborot xizmati")}
             </span>
             <h2 className="text-2xl font-bold text-slate-900 mt-1">
-              {t(settings.newsTitle || "Yangiliklar va rasmiy xabarlar")}
+              {limit ? t("So'nggi yangiliklar") : t(settings.newsTitle || "Yangiliklar va rasmiy xabarlar")}
             </h2>
             <p className="text-slate-600 text-sm mt-1">
               {t(settings.newsSubtitle)}
@@ -131,6 +134,14 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
           </div>
 
           {/* Interactive Category Filter Tabs */}
+          {limit && onShowAll ? (
+            <button
+              onClick={onShowAll}
+              className="self-start md:self-auto inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-sky-800 text-white hover:bg-sky-900 shadow-xs"
+            >
+              {t("Barcha yangiliklar")} <ArrowRight className="w-4 h-4" />
+            </button>
+          ) : (
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
             {categories.map(cat => (
               <button
@@ -146,11 +157,12 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
               </button>
             ))}
           </div>
+          )}
         </div>
 
         {/* News Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredNews.map((item, idx) => {
+          {(limit ? filteredNews.slice(0, limit) : filteredNews).map((item, idx) => {
             const hasMultipleImages = (item.images && item.images.length > 1);
             const imageCount = item.images?.length || 1;
             const cardImg = (item.images && item.images[0]) || item.imageUrl;

@@ -1,9 +1,16 @@
 import React from 'react';
-import { MapPin, Phone, Mail, Clock, Send, Globe } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, Instagram, Facebook, Youtube } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 
 const MAP_LAT = '41.52793681140537';
 const MAP_LNG = '60.35879624415235';
+
+const SOCIAL_LINKS = [
+  { label: 'Telegram', href: 'https://t.me/qoshkopirtalim', Icon: Send, cls: 'bg-sky-50 text-sky-800 hover:bg-sky-100 border-sky-200', iconCls: 'text-sky-600' },
+  { label: 'Instagram', href: 'https://www.instagram.com/qoshkopirtalim?igsh=NDdtMHlsZjNkYjZ0', Icon: Instagram, cls: 'bg-pink-50 text-pink-800 hover:bg-pink-100 border-pink-200', iconCls: 'text-pink-600' },
+  { label: 'Facebook', href: 'https://www.facebook.com/groups/693971028087553', Icon: Facebook, cls: 'bg-blue-50 text-blue-800 hover:bg-blue-100 border-blue-200', iconCls: 'text-blue-600' },
+  { label: 'YouTube', href: 'https://www.youtube.com/@Qo%C5%9Fkopirtalim', Icon: Youtube, cls: 'bg-red-50 text-red-800 hover:bg-red-100 border-red-200', iconCls: 'text-red-600' },
+];
 
 export const ContactMapSection: React.FC = () => {
   const { settings, t } = usePortal();
@@ -87,28 +94,18 @@ export const ContactMapSection: React.FC = () => {
                 {t("Rasmiy ijtimoiy tarmoqlar:")}
               </span>
               <div className="flex flex-wrap gap-2">
-                {settings.telegramChannel && (
+                {SOCIAL_LINKS.map(({ label, href, Icon, cls, iconCls }) => (
                   <a
-                    href={settings.telegramChannel}
+                    key={label}
+                    href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3.5 py-2 bg-sky-50 text-sky-800 hover:bg-sky-100 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border border-sky-200"
+                    className={`px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border ${cls}`}
                   >
-                    <Send className="w-3.5 h-3.5 text-sky-600" />
-                    <span>{t("Telegram kanal")}</span>
+                    <Icon className={`w-3.5 h-3.5 ${iconCls}`} />
+                    <span>{t(label)}</span>
                   </a>
-                )}
-                {settings.facebookPage && (
-                  <a
-                    href={settings.facebookPage}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3.5 py-2 bg-blue-50 text-blue-800 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border border-blue-200"
-                  >
-                    <Globe className="w-3.5 h-3.5 text-blue-600" />
-                    <span>{t("Facebook sahifa")}</span>
-                  </a>
-                )}
+                ))}
               </div>
             </div>
           </div>

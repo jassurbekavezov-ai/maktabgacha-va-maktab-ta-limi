@@ -4,7 +4,8 @@
 import { pbkdf2Sync } from 'node:crypto';
 
 const login = (process.env.ADMIN_LOGIN || '').trim();
-const pass = process.env.ADMIN_PASSWORD || '';
+// Boshidagi/oxiridagi bo'sh joy va qator tashlanishlari olib tashlanadi (nusxa olishdagi xatolardan himoya)
+const pass = (process.env.ADMIN_PASSWORD || '').trim();
 
 if (!login || !pass) {
   console.error('ADMIN_LOGIN / ADMIN_PASSWORD sozlanmagan — login-parol orqali kirish o\'chiq (faqat Gmail).');

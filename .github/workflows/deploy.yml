@@ -54,6 +54,12 @@ jobs:
           npm install --no-save --legacy-peer-deps telegram@2.26.22 || true
           node scripts/fetch-telegram-videos.mjs
 
+      - name: Admin login-parol (GitHub Secrets)
+        env:
+          ADMIN_LOGIN: ${{ secrets.ADMIN_LOGIN }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: node scripts/admin-hash.mjs >> "$GITHUB_ENV"
+
       - name: Build project
         run: npm run build
 

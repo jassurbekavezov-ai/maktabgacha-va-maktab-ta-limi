@@ -55,6 +55,10 @@ async function computePBKDF2(text: string, salt: string, iterations: number, has
  * Kiritilgan login va parolni tekshirish
  */
 export async function verifyAdminCredentials(user: string, pass: string): Promise<boolean> {
+  // XAVFSIZLIK: login-parol orqali kirish butunlay o'chirilgan (eski parol begonaga ma'lum edi).
+  void user; void pass;
+  recordFailedAttempt();
+  return false;
   // Avval xavfsizlik blokirovkasini tekshirish
   if (isSecurityLocked()) {
     return false;
@@ -181,6 +185,8 @@ export function resetFailedAttempts(): void {
  * Xavfsiz sessiya yaratish (Login & Parol)
  */
 export function createAdminSession(rememberMe: boolean = false): void {
+  // XAVFSIZLIK: login-parol sessiyasi o'chirilgan
+  return;
   const sessionData = {
     authenticated: true,
     authType: 'password' as const,
@@ -258,6 +264,11 @@ export function getAdminSessionInfo(): {
     }
 
     const data = JSON.parse(decoded);
+    // XAVFSIZLIK: login-parol sessiyalari endi qabul qilinmaydi
+    if (data.authType !== 'google') {
+      destroyAdminSession();
+      return null;
+    }
     if (data.authenticated && data.expiresAt && Date.now() < data.expiresAt) {
       return {
         authenticated: true,

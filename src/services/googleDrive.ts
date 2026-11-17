@@ -20,7 +20,7 @@ export interface UploadMultipleResult {
 
 const DRIVE_API_URL = 'https://www.googleapis.com/drive/v3';
 const DRIVE_UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3/files';
-const OFFICIAL_PARENT_FOLDER_ID = PORTAL_CONFIG.DEFAULT_DRIVE_FOLDER_ID || "1xBvm3Oz0j4_n8YZB4sYPmA3EqcnqUp8d";
+const OFFICIAL_PARENT_FOLDER_ID = PORTAL_CONFIG.DEFAULT_DRIVE_FOLDER_ID || "";
 const FOLDER_NAME = "Qo'shko'pir_MMTB_Fayllar";
 
 /**
@@ -296,7 +296,9 @@ export const uploadMultipleFilesToDrive = async (
   let targetFolderUrl = '';
 
   if (!targetFolderId) {
-    const subFolder = await createSubFolderInDrive(folderTitle, OFFICIAL_PARENT_FOLDER_ID);
+    // Admin (sayt egasi) Drive'idagi asosiy jild ichida yaratiladi
+    const parentId = await getOrCreatePortalFolder();
+    const subFolder = await createSubFolderInDrive(folderTitle, parentId);
     targetFolderId = subFolder.id;
     targetFolderUrl = subFolder.webViewLink;
   } else {

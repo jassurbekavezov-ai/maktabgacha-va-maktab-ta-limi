@@ -467,27 +467,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Initial auto-sync and periodic background poll from Google Sheets
   useEffect(() => {
-    // 1. Detect spreadsheet ID from URL query ?sheet=... or ?spreadsheetId=...
-    try {
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        const urlSheet = params.get('sheet') || params.get('spreadsheetId');
-        if (urlSheet) {
-          const clean = extractSpreadsheetId(urlSheet);
-          setStoredSpreadsheetId(clean);
-          setGoogleSyncStatus(prev => ({
-            ...prev,
-            spreadsheetId: clean,
-            spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${clean}/edit`
-          }));
-          refreshDataFromSheets(clean);
-          // Clean param from address bar without reloading
-          const cleanUrl = window.location.pathname + window.location.hash;
-          window.history.replaceState({}, '', cleanUrl);
-          return;
-        }
-      }
-    } catch {}
+    // XAVFSIZLIK: ?sheet= havola parametri orqali bazani almashtirish o'chirildi.
 
     // 2. Initial fetch if ID already configured
     const initialId = getStoredSpreadsheetId() || settings.googleSpreadsheetId;

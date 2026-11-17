@@ -19,7 +19,8 @@ import {
   isSecurityLocked,
   getRemainingLockSeconds,
   getFailedAttemptsCount,
-  createAdminSession
+  createAdminSession,
+  isPasswordLoginEnabled
 } from '../../services/adminAuth';
 import { usePortal } from '../../context/PortalContext';
 
@@ -228,7 +229,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 {t("Xavfsiz Avtorizatsiya")}
               </span>
               <p className="text-xs text-slate-600 mt-0.5">
-                {t("Faqat ruxsat berilgan Gmail hisobi orqali kiring")}
+                {t(isPasswordLoginEnabled() ? "Gmail hisobingiz yoki login-parol orqali kiring" : "Faqat ruxsat berilgan Gmail hisobi orqali kiring")}
               </p>
             </div>
 
@@ -296,8 +297,8 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               </button>
             </div>
 
-            {/* XAVFSIZLIK: login-parol orqali kirish o'chirildi — faqat ruxsat berilgan Gmail */}
-            {false && (<>
+            {/* Login-parol formasi (GitHub Secrets'da ADMIN_LOGIN / ADMIN_PASSWORD sozlangan bo'lsa) */}
+            {isPasswordLoginEnabled() && (<>
             <div className="relative flex items-center py-1">
               <div className="flex-grow border-t border-slate-200" />
               <span className="shrink mx-3 text-[11px] font-semibold uppercase text-slate-400">

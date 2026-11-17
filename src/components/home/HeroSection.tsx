@@ -58,7 +58,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
                 {t(settings.heroTitle)}
               </h1>
 
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 max-w-2xl">
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 max-w-2xl whitespace-pre-line">
                 {t(settings.heroSubtitle)}
               </p>
 

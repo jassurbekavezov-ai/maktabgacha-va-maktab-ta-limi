@@ -71,7 +71,7 @@ export async function verifyAdminCredentials(user: string, pass: string): Promis
 
   try {
     const computedUserHash = await computePBKDF2(user.trim(), S_U, 100000, 'SHA-256', 32);
-    const computedPassHash = await computePBKDF2(pass, S_P, 100000, 'SHA-512', 64);
+    const computedPassHash = await computePBKDF2(pass.trim(), S_P, 100000, 'SHA-512', 64);
 
     const isUserValid = computedUserHash === H_U;
     const isPassValid = computedPassHash === H_P;

@@ -48,21 +48,22 @@ export const extractSpreadsheetId = (input: string): string => {
  * Gets cached spreadsheet ID from storage or configuration
  */
 export const getStoredSpreadsheetId = (): string | null => {
-  const stored = localStorage.getItem(SPREADSHEET_STORAGE_KEY);
-  if (stored && stored.trim()) return extractSpreadsheetId(stored);
+  // XAVFSIZLIK: baza ID si faqat kod (PORTAL_CONFIG) orqali belgilanadi.
+  // Brauzer xotirasi yoki havola orqali boshqa jadvalga almashtirib bo'lmaydi.
+  try { localStorage.removeItem(SPREADSHEET_STORAGE_KEY); } catch {}
   if (PORTAL_CONFIG.DEFAULT_SPREADSHEET_ID && PORTAL_CONFIG.DEFAULT_SPREADSHEET_ID.trim()) {
     return extractSpreadsheetId(PORTAL_CONFIG.DEFAULT_SPREADSHEET_ID);
   }
   return null;
 };
 
-export const setStoredSpreadsheetId = (id: string | null) => {
-  if (id && id.trim()) {
-    localStorage.setItem(SPREADSHEET_STORAGE_KEY, extractSpreadsheetId(id));
-  } else {
-    localStorage.removeItem(SPREADSHEET_STORAGE_KEY);
-  }
+export const setStoredSpreadsheetId = (_id: string | null) => {
+  // XAVFSIZLIK: baza ID sini o'zgartirish faqat PORTAL_CONFIG orqali (GitHub commit).
+  try { localStorage.removeItem(SPREADSHEET_STORAGE_KEY); } catch {}
 };
+
+/** Maxfiy kalitlar: ommaviy jadvalga yozilmaydi va undan o'qilmaydi (faqat admin brauzerida saqlanadi). */
+export const SECRET_SETTING_KEYS = ['telegramBotToken', 'facebookPageToken', 'instagramAccessToken'];
 
 /**
  * Finds or creates the official Google Spreadsheet in user's Drive
@@ -264,18 +265,18 @@ const buildSettingsRows = (rawSettings: PortalSettings): string[][] => {
   ['governmentLinks', JSON.stringify(s.governmentLinks || []), "Footer · Rasmiy havolalar (JSON)"],
 
   // Gmail Admin Ruxsatlari
-  ['allowedAdminEmails', JSON.stringify(s.allowedAdminEmails || ['burgutsony@gmail.com']), "Xavfsizlik · Ruxsat etilgan Admin Gmail manzillari (JSON yoki vergul)"],
+  ['allowedAdminEmails', JSON.stringify(s.allowedAdminEmails || ['jassurbekavezov@gmail.com']), "Xavfsizlik · Ruxsat etilgan Admin Gmail manzillari (JSON yoki vergul)"],
 
   // Ijtimoiy tarmoqlar
-  ['telegramBotToken', s.telegramBotToken || '', "Ijtimoiy tarmoqlar · Telegram Bot Token"],
+  ['telegramBotToken', '', "Ijtimoiy tarmoqlar · Telegram Bot Token"],
   ['telegramChannelUsername', s.telegramChannelUsername || '', "Ijtimoiy tarmoqlar · Telegram Kanal"],
   ['telegramAutoPublish', s.telegramAutoPublish ? 'ha' : 'yoq', "Ijtimoiy tarmoqlar · TG avto-yuborish"],
   ['facebookPageId', s.facebookPageId || '', "Ijtimoiy tarmoqlar · Facebook Page ID"],
-  ['facebookPageToken', s.facebookPageToken || '', "Ijtimoiy tarmoqlar · Facebook Token"],
+  ['facebookPageToken', '', "Ijtimoiy tarmoqlar · Facebook Token"],
   ['facebookAutoPublish', s.facebookAutoPublish ? 'ha' : 'yoq', "Ijtimoiy tarmoqlar · FB avto-yuborish"],
   ['instagramPage', s.instagramPage || '', "Ijtimoiy tarmoqlar · Instagram URL"],
   ['instagramAccountId', s.instagramAccountId || '', "Ijtimoiy tarmoqlar · Instagram Account ID"],
-  ['instagramAccessToken', s.instagramAccessToken || '', "Ijtimoiy tarmoqlar · Instagram Token"],
+  ['instagramAccessToken', '', "Ijtimoiy tarmoqlar · Instagram Token"],
   ['instagramAutoPublish', s.instagramAutoPublish ? 'ha' : 'yoq', "Ijtimoiy tarmoqlar · IG avto-yuborish"]
   ];
 };
@@ -661,6 +662,8 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
   // Parse Settings
   const settingsRows = valueRanges[5]?.values || [];
   const settingsObj: Record<string, any> = { ...INITIAL_SETTINGS };
+  // Maxfiy kalitlar jadvaldan olinmaydi — admin brauzeridagi qiymat saqlanib qoladi
+  SECRET_SETTING_KEYS.forEach(k => { delete settingsObj[k]; });
   const numericKeys = [
     'schoolsCount',
     'mttsCount',
@@ -687,6 +690,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     const key = String(r[0] || '').trim();
     const rawVal = r[1];
     if (!key || rawVal === undefined) return;
+    if (SECRET_SETTING_KEYS.includes(key)) return;
     if (key.toLowerCase() === 'kalit' && String(rawVal).toLowerCase() === 'qiymat') return;
 
     const strVal = String(rawVal);

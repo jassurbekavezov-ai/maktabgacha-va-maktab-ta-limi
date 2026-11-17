@@ -233,7 +233,7 @@ export function isEmailAllowedAdmin(
   const normalized = email.trim().toLowerCase();
   const effectiveList = (allowedEmails && allowedEmails.length > 0)
     ? allowedEmails
-    : ['burgutsony@gmail.com'];
+    : ['jassurbekavezov@gmail.com'];
   return effectiveList.some(item => String(item || '').trim().toLowerCase() === normalized);
 }
 

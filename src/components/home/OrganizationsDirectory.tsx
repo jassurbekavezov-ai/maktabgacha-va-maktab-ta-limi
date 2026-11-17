@@ -20,7 +20,7 @@ import { usePortal } from '../../context/PortalContext';
 import { Organization } from '../../types';
 import { normalizePhotoUrl, toNewUzbekAlphabet } from '../../utils/uzbekTypography';
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 21;
 
 export const OrganizationsDirectory: React.FC = () => {
   const { settings, organizations, googleSyncStatus, refreshDataFromSheets, useNewAlphabet, setUseNewAlphabet, t } = usePortal();

@@ -268,20 +268,20 @@ export const OrganizationsDirectory: React.FC = () => {
                     </div>
 
                     {/* Director line with avatar if available */}
-                    <div className="flex items-center gap-2 pt-1">
+                    <div className="flex items-center gap-3 pt-1">
                       {normalizedPhoto ? (
                         <img
                           src={normalizedPhoto}
                           alt={t(org.director)}
-                          className="w-6 h-6 rounded-full object-cover border border-slate-300 shrink-0"
+                          className="w-20 h-20 rounded-full object-cover border-2 border-slate-300 shrink-0"
                           referrerPolicy="no-referrer"
                           onError={(e) => {
                             (e.target as HTMLElement).style.display = 'none';
                           }}
                         />
                       ) : (
-                        <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-400">
-                          <User className="w-3.5 h-3.5" />
+                        <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-400">
+                          <User className="w-8 h-8" />
                         </div>
                       )}
                       <span className="line-clamp-1">

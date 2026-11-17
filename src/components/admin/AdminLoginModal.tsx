@@ -228,7 +228,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 {t("Xavfsiz Avtorizatsiya")}
               </span>
               <p className="text-xs text-slate-600 mt-0.5">
-                {t("Ruxsat berilgan Gmail hisobingiz yoki maxfiy login-parol orqali kiring")}
+                {t("Faqat ruxsat berilgan Gmail hisobi orqali kiring")}
               </p>
             </div>
 
@@ -296,6 +296,8 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               </button>
             </div>
 
+            {/* XAVFSIZLIK: login-parol orqali kirish o'chirildi — faqat ruxsat berilgan Gmail */}
+            {false && (<>
             <div className="relative flex items-center py-1">
               <div className="flex-grow border-t border-slate-200" />
               <span className="shrink mx-3 text-[11px] font-semibold uppercase text-slate-400">
@@ -420,6 +422,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 )}
               </button>
             </form>
+            </>)}
           </div>
 
           {/* Footer note */}

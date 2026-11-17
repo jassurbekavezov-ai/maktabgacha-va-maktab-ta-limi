@@ -38,6 +38,22 @@ jobs:
       - name: Telegram kanal postlarini olish
         run: node scripts/fetch-telegram-news.mjs
 
+      - name: Telegram videolar keshi
+        uses: actions/cache@v4
+        with:
+          path: public/tg-videos
+          key: tg-videos-${{ github.run_id }}
+          restore-keys: tg-videos-
+
+      - name: Oxirgi 3 ta videoni saytga yuklash
+        env:
+          TG_API_ID: ${{ secrets.TG_API_ID }}
+          TG_API_HASH: ${{ secrets.TG_API_HASH }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+        run: |
+          npm install --no-save --legacy-peer-deps telegram@2.26.22 || true
+          node scripts/fetch-telegram-videos.mjs
+
       - name: Build project
         run: npm run build
 

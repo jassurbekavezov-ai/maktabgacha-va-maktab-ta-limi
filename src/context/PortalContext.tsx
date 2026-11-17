@@ -178,7 +178,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [telegramNews, setTelegramNews] = useState<NewsItem[]>([]);
   useEffect(() => {
     let cancelled = false;
-    fetch(`/telegram-news.json?t=${Math.floor(Date.now() / 300000)}`)
+    fetch(`/telegram-news.json?t=${Math.floor(Date.now() / 60000)}`, { cache: 'no-cache' })
       .then(res => (res.ok ? res.json() : []))
       .then(data => {
         if (!cancelled && Array.isArray(data)) setTelegramNews(data);

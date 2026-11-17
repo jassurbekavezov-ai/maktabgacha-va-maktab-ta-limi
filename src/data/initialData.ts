@@ -293,7 +293,7 @@ export const INITIAL_SETTINGS: PortalSettings = {
 
   // Gmail bilan admin panelga kirish ruxsati berilgan hisoblar
   allowedAdminEmails: [
-    "burgutsony@gmail.com"
+    "jassurbekavezov@gmail.com"
   ],
 
   // Telegram, Facebook va Instagram ijtimoiy tarmoqlariga avtomatik yuborish sozlamalari

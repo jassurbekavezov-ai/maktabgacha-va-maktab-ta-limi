@@ -11,11 +11,19 @@
  */
 
 // Kriptografik tuzlar va xeshlar (Parol yoki login hech qayerda ochiq yozilmagan!)
+// Login va parol GitHub Secrets'da (ADMIN_LOGIN, ADMIN_PASSWORD) saqlanadi.
+// Deploy paytida ulardan faqat xesh hisoblanadi va saytga shu xesh qo'yiladi (ochiq matn hech qayerda yo'q).
+// Login/parolni o'zgartirish: GitHub → Settings → Secrets → ADMIN_LOGIN / ADMIN_PASSWORD ni yangilab, deploy qilish.
 const S_P = 'qoshkopir_mmtb_salt_98472918374921';
-const H_P = '3c146e1e06dfade979902e1eddae9ca4525cb63baf3f32f75789235db5591fd7a919f4053a14dd094dacafd2e3f3125b91e10a53d99dc99cf283bc4f8625f9d2';
+const H_P: string = String(import.meta.env.VITE_ADMIN_PASS_HASH || '').trim().toLowerCase();
 
 const S_U = 'qoshkopir_admin_user_salt_2026';
-const H_U = 'cf803dfc09ded21a8ae6a28c2a87db630a119b8155108f8e524e33a5ba523b33';
+const H_U: string = String(import.meta.env.VITE_ADMIN_USER_HASH || '').trim().toLowerCase();
+
+/** Login-parol orqali kirish yoqilganmi (Secrets sozlangan bo'lsa) */
+export const isPasswordLoginEnabled = (): boolean => H_P.length === 128 && H_U.length === 64;
+// Parol o'zgarsa, eski parol bilan ochilgan sessiyalar avtomatik bekor bo'ladi
+const CRED_VERSION = H_P.slice(0, 16);
 
 const SESSION_KEY = 'mmtb_admin_secure_session_v2';
 const SECURITY_LOCK_KEY = 'mmtb_admin_sec_lock_v2';
@@ -55,10 +63,7 @@ async function computePBKDF2(text: string, salt: string, iterations: number, has
  * Kiritilgan login va parolni tekshirish
  */
 export async function verifyAdminCredentials(user: string, pass: string): Promise<boolean> {
-  // XAVFSIZLIK: login-parol orqali kirish butunlay o'chirilgan (eski parol begonaga ma'lum edi).
-  void user; void pass;
-  recordFailedAttempt();
-  return false;
+  if (!isPasswordLoginEnabled()) return false;
   // Avval xavfsizlik blokirovkasini tekshirish
   if (isSecurityLocked()) {
     return false;
@@ -185,11 +190,11 @@ export function resetFailedAttempts(): void {
  * Xavfsiz sessiya yaratish (Login & Parol)
  */
 export function createAdminSession(rememberMe: boolean = false): void {
-  // XAVFSIZLIK: login-parol sessiyasi o'chirilgan
-  return;
+  if (!isPasswordLoginEnabled()) return;
   const sessionData = {
     authenticated: true,
     authType: 'password' as const,
+    credVersion: CRED_VERSION,
     user: 'Tashkilot Administratori',
     loginTime: Date.now(),
     expiresAt: rememberMe ? Date.now() + 24 * 3600 * 1000 : Date.now() + 4 * 3600 * 1000,
@@ -264,8 +269,8 @@ export function getAdminSessionInfo(): {
     }
 
     const data = JSON.parse(decoded);
-    // XAVFSIZLIK: login-parol sessiyalari endi qabul qilinmaydi
-    if (data.authType !== 'google') {
+    // Login-parol sessiyasi faqat joriy parol bilan ochilgan bo'lsa qabul qilinadi
+    if (data.authType !== 'google' && (!isPasswordLoginEnabled() || data.credVersion !== CRED_VERSION)) {
       destroyAdminSession();
       return null;
     }

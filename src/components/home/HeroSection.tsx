@@ -212,7 +212,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
               )}
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className={`grid grid-cols-2 sm:grid-cols-3 ${quickServicesList.length === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-6'} gap-3`}>
               {quickServicesList.map((srv, idx) => {
                 const Icon = getServiceIcon(srv.title);
                 if (srv.isExternal && srv.link) {

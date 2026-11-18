@@ -6,7 +6,6 @@ import {
   Eye,
   Menu,
   X,
-  ShieldCheck,
   ChevronRight,
   Database,
   Sparkles
@@ -260,32 +259,12 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
             onClick={() => onNavigate('murojaat')}
             className="px-4 py-2 text-xs font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-md transition-colors shadow-xs"
           >
-            {t(settings.navLabels?.reception || "Virtual qabulxona")}
-          </button>
-
-          <button
-            onClick={onOpenAdmin}
-            className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-md transition-colors"
-          >
-            {user?.photoURL ? (
-              <img src={user.photoURL} alt="" className="w-4 h-4 rounded-full" />
-            ) : (
-              <ShieldCheck className="w-4 h-4 text-sky-700" />
-            )}
-            <span>{t("Admin panel")}</span>
+            {t("Murojaat yo'llash")}
           </button>
         </div>
 
         {/* Mobile Hamburger Button */}
         <div className="flex items-center gap-2 lg:hidden">
-          <button
-            onClick={onOpenAdmin}
-            className="p-2 text-slate-700 hover:bg-slate-100 rounded-md"
-            aria-label={t("Admin panel")}
-            title={t("Admin panel")}
-          >
-            <ShieldCheck className="w-5 h-5 text-sky-700" />
-          </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 text-slate-700 hover:bg-slate-100 rounded-md"
@@ -349,16 +328,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
               }}
               className="w-full py-2.5 text-center text-sm font-semibold text-white bg-sky-800 rounded-md"
             >
-              {t("Virtual qabulxona (Murojaat yuborish)")}
-            </button>
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenAdmin();
-              }}
-              className="w-full py-2.5 text-center text-sm font-medium text-slate-700 bg-slate-100 border border-slate-300 rounded-md"
-            >
-              {t("Admin panel (Boshqaruv)")}
+              {t("Murojaat yo'llash")}
             </button>
           </div>
         </div>

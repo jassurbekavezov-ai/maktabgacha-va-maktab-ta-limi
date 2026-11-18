@@ -6,7 +6,6 @@ import {
   Trophy,
   Send,
   BookOpen,
-  ArrowRight,
   ExternalLink,
   MapPin,
   School,
@@ -22,10 +21,7 @@ interface HeroSectionProps {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNavigate }) => {
-  const { publicNews: news, settings, t } = usePortal();
-
-  // Find pinned or most recent news
-  const featuredNews = news.find(n => n.isPinned) || news[0];
+  const { settings, t } = usePortal();
 
   const quickServicesList = settings.quickServices || [];
 
@@ -94,7 +90,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
     } else if (low.startsWith('af')) {
       Icon = GraduationCap;
     } else if (low.includes('markaz')) {
-      label = t('Rivojlantirish markazi');
+      label = t('Ilk rivojlantirish markazi');
       Icon = BookOpen;
     }
     return { value, label, Icon };
@@ -163,50 +159,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
                 </p>
               )}
 
-              {/* Featured News Card */}
-              {featuredNews && (
-                <div
-                  onClick={() => onSelectNews(featuredNews)}
-                  className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs hover:shadow-md transition-all cursor-pointer group"
-                >
-                  <div className="flex items-center gap-2 text-xs text-sky-700 font-semibold mb-1.5">
-                    <span>{t(featuredNews.category)}</span>
-                    <span>·</span>
-                    <span className="text-slate-500 font-normal">{featuredNews.date}</span>
-                    <span>·</span>
-                    <span className="text-slate-500 font-normal">{featuredNews.views} {t("ko'rildi")}</span>
-                  </div>
-                  <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-sky-700 transition-colors line-clamp-2 mb-2">
-                    {t(featuredNews.title)}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed mb-3">
-                    {t(featuredNews.summary)}
-                  </p>
-                  <div className="flex items-center text-xs font-semibold text-sky-700 group-hover:translate-x-1 transition-transform">
-                    <span>{t("Batafsil o'qish")}</span>
-                    <ArrowRight className="w-3.5 h-3.5 ml-1" />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Quick Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 mt-6">
-              <button
-                onClick={() => onNavigate('murojaat')}
-                className="px-5 py-2.5 bg-sky-800 hover:bg-sky-900 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-2"
-              >
-                <Send className="w-4 h-4" />
-                <span>{t(settings.heroPrimaryBtnText || "Murojaat yo'llash")}</span>
-              </button>
-
-              <button
-                onClick={() => onNavigate('muassasalar')}
-                className="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-800 text-sm font-semibold rounded-lg border border-slate-300 transition-colors flex items-center gap-2"
-              >
-                <GraduationCap className="w-4 h-4 text-sky-700" />
-                <span>{t(settings.heroSecondaryBtnText || "Muassasalar katalogi")}</span>
-              </button>
             </div>
           </div>
 

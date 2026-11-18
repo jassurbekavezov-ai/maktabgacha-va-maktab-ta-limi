@@ -13,7 +13,6 @@ import {
   FileText,
   ChevronRight,
   ChevronLeft,
-  ArrowRight,
   CalendarDays,
   Eye
 } from 'lucide-react';
@@ -212,13 +211,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
                 </p>
               )}
 
-              <button
-                onClick={() => onNavigate('bolim-haqida')}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-sky-900 hover:bg-sky-950 text-white text-sm font-bold shadow-lg shadow-sky-900/20 transition-colors"
-              >
-                <span>{t("Batafsil ma'lumot")}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
             </div>
           </div>
 

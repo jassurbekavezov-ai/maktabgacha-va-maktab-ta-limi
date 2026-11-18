@@ -8,7 +8,9 @@ import {
   BookOpen,
   ArrowRight,
   ExternalLink,
-  MapPin
+  MapPin,
+  School,
+  Sparkles
 } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 import { NewsItem } from '../../types';
@@ -37,6 +39,67 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
     return Send;
   };
 
+  // Sarlavhani rangli qismlarga ajratish: "A — B, C D..." => B (to'q), C (ko'k), qolgani (oltin)
+  const renderTitle = (raw: string) => {
+    const dashIdx = raw.indexOf('—');
+    if (dashIdx === -1) return raw;
+    const head = raw.slice(0, dashIdx + 1);
+    const tail = raw.slice(dashIdx + 1);
+    const commaIdx = tail.lastIndexOf(',');
+    if (commaIdx === -1) {
+      return (<>{head}<span className="text-sky-700">{tail}</span></>);
+    }
+    const before = tail.slice(0, commaIdx + 1);
+    const after = tail.slice(commaIdx + 1).trim().split(/\s+/);
+    const first = after.shift() || '';
+    return (
+      <>
+        {head}{before}{' '}
+        <span className="bg-gradient-to-r from-sky-700 to-sky-500 bg-clip-text text-transparent">{first}</span>{' '}
+        <span className="bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">{after.join(' ')}</span>
+      </>
+    );
+  };
+
+  // Izoh matnidan "• 54 ta maktab" kabi qatorlarni statistik kartochkalarga aylantirish
+  const subtitleText = t(settings.heroSubtitle || '');
+  const subtitleLines = subtitleText.split('\n').map(l => l.trim()).filter(Boolean);
+  const statLines = subtitleLines.filter(l => /^[•\-*·]\s*\d+/.test(l));
+  const introLines = subtitleLines.filter(l => !/^[•\-*·]\s*\d+/.test(l));
+  let introText = introLines.join(' ');
+  if (statLines.length && introText.endsWith(':') && !/soni/i.test(introText)) {
+    introText = introText.slice(0, -1) + ' soni:';
+  }
+
+  const statPalettes = [
+    { box: 'bg-sky-50 text-sky-700 ring-sky-100', bar: 'from-sky-500 to-sky-700', num: 'text-sky-900' },
+    { box: 'bg-amber-50 text-amber-600 ring-amber-100', bar: 'from-amber-400 to-amber-600', num: 'text-slate-900' },
+    { box: 'bg-emerald-50 text-emerald-600 ring-emerald-100', bar: 'from-emerald-400 to-emerald-600', num: 'text-slate-900' },
+    { box: 'bg-indigo-50 text-indigo-600 ring-indigo-100', bar: 'from-indigo-400 to-indigo-600', num: 'text-slate-900' },
+  ];
+
+  const stats = statLines.map((line) => {
+    const m = line.replace(/^[•\-*·]\s*/, '').match(/^(\d+)\s*(?:ta\s+)?(.+)$/i);
+    const value = m ? m[1] : '';
+    const rawLabel = m ? m[2].trim() : line;
+    const low = rawLabel.toLowerCase();
+    let label = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1);
+    let Icon: React.ElementType = Sparkles;
+    if (low.includes('maktabga') || low.includes('mtt') || low.includes("bog'")) {
+      label = t("Davlat MTT (Bog'chalar)");
+      Icon = Baby;
+    } else if (low.includes('maktab')) {
+      label = t('Maktablar');
+      Icon = School;
+    } else if (low.startsWith('af')) {
+      Icon = GraduationCap;
+    } else if (low.includes('markaz')) {
+      label = t('Rivojlantirish markazi');
+      Icon = BookOpen;
+    }
+    return { value, label, Icon };
+  }).sort((a, b) => Number(b.value) - Number(a.value));
+
   return (
     <section className="bg-gradient-to-b from-sky-50/60 to-white pt-6 pb-12 border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -55,12 +118,50 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
 
               {/* Main Headline */}
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4 text-balance">
-                {t(settings.heroTitle)}
+                {renderTitle(t(settings.heroTitle))}
               </h1>
 
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 max-w-2xl whitespace-pre-line">
-                {t(settings.heroSubtitle)}
-              </p>
+              {stats.length > 0 ? (
+                <>
+                  {introText && (
+                    <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-4 max-w-2xl">
+                      {introText}
+                    </p>
+                  )}
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
+                    {stats.map((st, i) => {
+                      const pal = statPalettes[i % statPalettes.length];
+                      const Icon = st.Icon;
+                      return (
+                        <div
+                          key={i}
+                          onClick={() => onNavigate('muassasalar')}
+                          className="relative overflow-hidden bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm hover:shadow-lg hover:-translate-y-0.5 hover:border-sky-200 transition-all duration-300 cursor-pointer group"
+                        >
+                          <span className={`absolute left-0 top-0 h-full w-1 bg-gradient-to-b ${pal.bar} opacity-80`} />
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className={`text-3xl sm:text-4xl font-extrabold tracking-tight leading-none ${pal.num}`}>
+                                {st.value}
+                              </div>
+                              <div className="mt-2 text-xs sm:text-sm font-medium text-slate-600 leading-snug">
+                                {st.label}
+                              </div>
+                            </div>
+                            <div className={`shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl ring-1 ${pal.box} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                              <Icon className="w-5 h-5" />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : (
+                <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 max-w-2xl whitespace-pre-line">
+                  {subtitleText}
+                </p>
+              )}
 
               {/* Featured News Card */}
               {featuredNews && (

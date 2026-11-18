@@ -45,7 +45,6 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
     { id: 'muassasalar', label: t(settings.navLabels?.orgs || 'Muassasalar') },
     { id: 'hujjatlar', label: t(settings.navLabels?.docs || 'Hujjatlar') },
     { id: 'yangiliklar', label: t(settings.navLabels?.news || 'Yangiliklar') },
-    { id: 'murojaat', label: t(settings.navLabels?.reception || 'Virtual qabulxona') },
     { id: 'aloqa', label: t(settings.navLabels?.contact || 'Aloqa') },
   ];
 

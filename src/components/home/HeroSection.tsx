@@ -107,11 +107,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
   const [slide, setSlide] = useState(0);
   const slideCount = slides.length;
 
+  // Sayt ochilganda avval idora binosi rasmi 5 soniya ko'rinadi, keyin yangiliklar slayderi boshlanadi
+  const [showIntro, setShowIntro] = useState(true);
   useEffect(() => {
-    if (slideCount < 2) return;
+    const id = setTimeout(() => setShowIntro(false), 5000);
+    return () => clearTimeout(id);
+  }, []);
+
+  useEffect(() => {
+    if (showIntro || slideCount < 2) return;
     const id = setInterval(() => setSlide(s => (s + 1) % slideCount), 6000);
     return () => clearInterval(id);
-  }, [slideCount]);
+  }, [slideCount, showIntro]);
 
   useEffect(() => {
     if (slide >= slideCount) setSlide(0);
@@ -217,6 +224,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
           {/* O'ng panel: yangiliklar slayderi */}
           <div className="lg:col-span-5 flex flex-col w3-animate-right">
             <div className="relative flex-1 min-h-[340px] lg:min-h-[480px] rounded-3xl overflow-hidden shadow-xl border border-slate-200 group">
+              {/* Kirish rasmi: idora binosi (5 soniya) */}
+              <div
+                onClick={() => setShowIntro(false)}
+                className={`absolute inset-0 transition-opacity duration-700 ${showIntro ? 'opacity-100 z-30 cursor-pointer' : 'opacity-0 z-0 pointer-events-none'}`}
+              >
+                <img
+                  src="./assets/1795062028198_Idorani%20oldi.jpg"
+                  alt={t(settings.districtName)}
+                  className="w-full h-full object-cover scale-[1.04]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                  <p className="text-lg sm:text-2xl font-bold leading-snug">{t(settings.districtName)}</p>
+                </div>
+              </div>
               {slideCount > 0 ? (
                 slides.map((n, i) => (
                   <div
@@ -281,7 +303,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
             </div>
 
             {slideCount > 1 && (
-              <div className="flex items-center justify-center gap-2 py-4">
+              <div className={`flex items-center justify-center gap-2 py-4 transition-opacity duration-700 ${showIntro ? 'opacity-0' : 'opacity-100'}`}>
                 {slides.map((_, i) => (
                   <button
                     key={i}

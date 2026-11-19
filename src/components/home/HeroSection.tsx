@@ -227,16 +227,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
               {/* Kirish rasmi: idora binosi (5 soniya) */}
               <div
                 onClick={() => setShowIntro(false)}
-                className={`absolute inset-0 transition-opacity duration-700 ${showIntro ? 'opacity-100 z-30 cursor-pointer' : 'opacity-0 z-0 pointer-events-none'}`}
+                className={`absolute inset-0 z-30 overflow-hidden transition-all duration-[1400ms] ease-in-out ${showIntro ? 'opacity-100 scale-100 blur-0 cursor-pointer' : 'opacity-0 scale-110 blur-md pointer-events-none'}`}
               >
+                <style>{`
+                  @keyframes introKenBurns { from { transform: scale(1.04); } to { transform: scale(1.14); } }
+                  @keyframes introCaption { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+                  .intro-kenburns { animation: introKenBurns 6.5s ease-out forwards; }
+                  .intro-caption { opacity: 0; animation: introCaption 0.9s ease-out 0.4s forwards; }
+                `}</style>
                 <img
                   src="./assets/1795062028198_Idorani%20oldi.jpg"
                   alt={t(settings.districtName)}
-                  className="w-full h-full object-cover scale-[1.04]"
+                  className="w-full h-full object-cover intro-kenburns"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                  <p className="text-lg sm:text-2xl font-bold leading-snug">{t(settings.districtName)}</p>
+                  <p className="intro-caption text-lg sm:text-2xl font-bold leading-snug drop-shadow">{t("Qo'shko'pir tumani ta'lim bo'limi")}</p>
                 </div>
               </div>
               {slideCount > 0 ? (

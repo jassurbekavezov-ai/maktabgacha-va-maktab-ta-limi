@@ -1,0 +1,47 @@
+name: Telegram kuzatuvchi
+
+# Telegram kanalini har 2 daqiqada tekshiradi; yangi post chiqsa saytni darhol yangilaydi.
+# Har soatda qayta ishga tushadi (eski nusxa avtomatik to'xtatiladi), shuning uchun kuzatuv uzilmaydi.
+on:
+  schedule:
+    - cron: '7 * * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: tg-watch
+  cancel-in-progress: true
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - name: Yangi postlarni kuzatish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          CHANNEL: qoshkopirtalim
+        run: |
+          latest_tg() {
+            curl -fsSL -A 'Mozilla/5.0' "https://t.me/s/${CHANNEL}" \
+              | grep -oiE "data-post=\"${CHANNEL}/[0-9]+\"" | grep -oE '[0-9]+' | sort -n | tail -1
+          }
+          latest_site() {
+            curl -fsSL "https://qoshkopirtalim.uz/telegram-news.json?t=$(date +%s)" \
+              | grep -oE '"telegramMessageId": *"[0-9]+"' | grep -oE '[0-9]+' | sort -n | tail -1
+          }
+          last=$(latest_site || echo 0)
+          echo "Saytdagi oxirgi post: ${last:-0}"
+          end=$((SECONDS + 340 * 60))
+          while [ $SECONDS -lt $end ]; do
+            cur=$(latest_tg || echo 0)
+            if [ -n "$cur" ] && [ "$cur" -gt "${last:-0}" ]; then
+              echo "$(date -u +%H:%M) Yangi post: $cur — sayt yangilanmoqda"
+              if gh workflow run deploy.yml --repo "$REPO" --ref main; then last=$cur; fi
+            fi
+            sleep 120
+          done

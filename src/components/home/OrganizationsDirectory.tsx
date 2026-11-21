@@ -273,14 +273,14 @@ export const OrganizationsDirectory: React.FC = () => {
                         <img
                           src={normalizedPhoto}
                           alt={t(org.director)}
-                          className="w-20 h-20 rounded-full object-cover border-2 border-slate-300 shrink-0"
+                          className="w-20 h-24 rounded-md object-cover border-2 border-slate-300 shrink-0"
                           referrerPolicy="no-referrer"
                           onError={(e) => {
                             (e.target as HTMLElement).style.display = 'none';
                           }}
                         />
                       ) : (
-                        <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-400">
+                        <div className="w-20 h-24 rounded-md bg-slate-100 flex items-center justify-center shrink-0 text-slate-400">
                           <User className="w-8 h-8" />
                         </div>
                       )}
